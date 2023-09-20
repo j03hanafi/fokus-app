@@ -1,24 +1,41 @@
 import React from "react";
 import moment from "moment";
+import {
+  BreakSession,
+  BreakSessionButton,
+  BreakSessionButtonContainer,
+  BreakSessionLabel,
+  BreakSessionLength,
+} from "@/ui/BreakSession";
 
 const Break = ({
   breakLength,
   decrementBreakLengthByOneMinute,
   incrementBreakLengthByOneMinute,
 }) => {
-  const breakLengthInMinutes = moment.duration(breakLength, "s").minutes();
+  const breakLengthInMinutes = moment.duration(breakLength, "s").asMinutes();
 
   return (
-    <div>
-      <p id="break-label">Break</p>
-      <p id="break-length">{breakLengthInMinutes}</p>
-      <button onClick={decrementBreakLengthByOneMinute} id="break-decrement">
-        -
-      </button>
-      <button onClick={incrementBreakLengthByOneMinute} id="break-increment">
-        +
-      </button>
-    </div>
+    <BreakSession>
+      <BreakSessionLabel id="break-label">Break</BreakSessionLabel>
+      <BreakSessionLength id="break-length">
+        {breakLengthInMinutes}
+      </BreakSessionLength>
+      <BreakSessionButtonContainer>
+        <BreakSessionButton
+          onClick={decrementBreakLengthByOneMinute}
+          id="break-decrement"
+        >
+          -
+        </BreakSessionButton>
+        <BreakSessionButton
+          onClick={incrementBreakLengthByOneMinute}
+          id="break-increment"
+        >
+          +
+        </BreakSessionButton>
+      </BreakSessionButtonContainer>
+    </BreakSession>
   );
 };
 

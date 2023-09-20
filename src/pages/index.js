@@ -1,6 +1,5 @@
 import Head from "next/head";
 import { Inter } from "next/font/google";
-import styles from "@/styles/Home.module.css";
 import Break from "@/components/Break";
 import Session from "@/components/Session";
 import { useEffect, useRef, useState } from "react";
@@ -22,28 +21,30 @@ export default function Home() {
 
   const decrementBreakLengthByOneMinute = () => {
     const newBreakLength = breakLength - 60;
-    if (newBreakLength < 0) {
-      setBreakLength(0);
-    } else {
+    if (newBreakLength > 0) {
       setBreakLength(newBreakLength);
     }
   };
 
   const incrementBreakLengthByOneMinute = () => {
-    setBreakLength(breakLength + 60);
+    const newBreakLength = breakLength + 60;
+    if (newBreakLength <= 60 * 60) {
+      setBreakLength(newBreakLength);
+    }
   };
 
   const decrementSessionLengthByOneMinute = () => {
     const newSessionLength = sessionLength - 60;
-    if (newSessionLength < 0) {
-      setSessionLength(0);
-    } else {
+    if (newSessionLength > 0) {
       setSessionLength(newSessionLength);
     }
   };
 
   const incrementSessionLengthByOneMinute = () => {
-    setSessionLength(sessionLength + 60);
+    const newSessionLength = sessionLength + 60;
+    if (newSessionLength <= 60 * 60) {
+      setSessionLength(sessionLength + 60);
+    }
   };
 
   const isStarted = intervalID !== null;
@@ -64,10 +65,10 @@ export default function Home() {
 
           if (currentSessionType === "Session") {
             setCurrentSessionType("Break");
-            setTimeLeft(breakLength);
+            return breakLength;
           } else if (currentSessionType === "Break") {
             setCurrentSessionType("Session");
-            setTimeLeft(sesionLength);
+            return sessionLength;
           }
         });
       }, 100);
@@ -81,7 +82,7 @@ export default function Home() {
     setCurrentSessionType("Session");
     setSessionLength(60 * 25);
     setBreakLength(300);
-    setTimeLeft(sessionLength);
+    setTimeLeft(60 * 25);
     audioElement.current.load();
   };
 
@@ -93,26 +94,30 @@ export default function Home() {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <main className={`${styles.main} ${inter.className}`}>
-        <Session
-          sessionLength={sessionLength}
-          decrementSessionLengthByOneMinute={decrementSessionLengthByOneMinute}
-          incrementSessionLengthByOneMinute={incrementSessionLengthByOneMinute}
-        />
-        <TimeLeft
-          timerLabel={currentSessionType}
-          handleStartStopClick={handleStartStopClick}
-          startStopButtonLabel={isStarted ? "Stop" : "Start"}
-          timeLeft={timeLeft}
-        />
-        <Break
-          breakLength={breakLength}
-          decrementBreakLengthByOneMinute={decrementBreakLengthByOneMinute}
-          incrementBreakLengthByOneMinute={incrementBreakLengthByOneMinute}
-        />
-        <button id="reset" onClick={resetButtonHandler}>
-          Reset
-        </button>
+      <main className="container mx-auto flex flex-col h-screen items-center justify-center ">
+        <div className="flex flex-col md:flex-row w-full justify-around items-center">
+          <Session
+            sessionLength={sessionLength}
+            decrementSessionLengthByOneMinute={
+              decrementSessionLengthByOneMinute
+            }
+            incrementSessionLengthByOneMinute={
+              incrementSessionLengthByOneMinute
+            }
+          />
+          <TimeLeft
+            resetButtonHandler={resetButtonHandler}
+            timerLabel={currentSessionType}
+            handleStartStopClick={handleStartStopClick}
+            startStopButtonLabel={isStarted ? "Stop" : "Start"}
+            timeLeft={timeLeft}
+          />
+          <Break
+            breakLength={breakLength}
+            decrementBreakLengthByOneMinute={decrementBreakLengthByOneMinute}
+            incrementBreakLengthByOneMinute={incrementBreakLengthByOneMinute}
+          />
+        </div>
         <audio id="beep" ref={audioElement}>
           <source
             src="https://assets.mixkit.co/active_storage/sfx/995/995-preview.mp3"
