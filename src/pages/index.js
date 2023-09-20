@@ -53,7 +53,7 @@ export default function Home() {
           decrementSessionLengthByOneMinute={decrementSessionLengthByOneMinute}
           incrementSessionLengthByOneMinute={incrementSessionLengthByOneMinute}
         />
-        <TimeLeft sesionLength={sessionLength} />
+        <TimeLeft sesionLength={sessionLength} breakLength={breakLength} />
         <Break
           breakLength={breakLength}
           decrementBreakLengthByOneMinute={decrementBreakLengthByOneMinute}
