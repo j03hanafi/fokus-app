@@ -68,7 +68,7 @@ export default function Home() {
     } else {
       const newIntervalID = setInterval(() => {
         setTimeLeft((prevTimeLeft) => prevTimeLeft - 1);
-      }, 50);
+      }, 1000);
       setIntervalID(newIntervalID);
     }
   };
