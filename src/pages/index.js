@@ -19,6 +19,19 @@ export default function Home() {
     setTimeLeft(sessionLength);
   }, [sessionLength]);
 
+  useEffect(() => {
+    if (timeLeft === 0) {
+      audioElement.current.play();
+      if (currentSessionType === "Session") {
+        setCurrentSessionType("Break");
+        setTimeLeft(breakLength);
+      } else if (currentSessionType === "Break") {
+        setCurrentSessionType("Session");
+        setTimeLeft(sessionLength);
+      }
+    }
+  }, [breakLength, currentSessionType, sessionLength, timeLeft]);
+
   const decrementBreakLengthByOneMinute = () => {
     const newBreakLength = breakLength - 60;
     if (newBreakLength > 0) {
@@ -55,23 +68,8 @@ export default function Home() {
       setIntervalID(null);
     } else {
       const newIntervalID = setInterval(() => {
-        setTimeLeft((prevTimeLeft) => {
-          const newTimeLeft = prevTimeLeft - 1;
-          if (newTimeLeft >= 0) {
-            return newTimeLeft;
-          }
-
-          audioElement.current.play();
-
-          if (currentSessionType === "Session") {
-            setCurrentSessionType("Break");
-            return breakLength;
-          } else if (currentSessionType === "Break") {
-            setCurrentSessionType("Session");
-            return sessionLength;
-          }
-        });
-      }, 100);
+        setTimeLeft((prevTimeLeft) => prevTimeLeft - 1);
+      }, 50);
       setIntervalID(newIntervalID);
     }
   };
