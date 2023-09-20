@@ -8,7 +8,7 @@ import {
   BreakSessionLength,
 } from "@/ui/BreakSession";
 
-const Session = ({
+const Session: React.FC<Props> = ({
   sessionLength,
   decrementSessionLengthByOneMinute,
   incrementSessionLengthByOneMinute,
@@ -39,6 +39,12 @@ const Session = ({
       </BreakSessionButtonContainer>
     </BreakSession>
   );
+};
+
+type Props = {
+  sessionLength: number;
+  decrementSessionLengthByOneMinute: () => void;
+  incrementSessionLengthByOneMinute: () => void;
 };
 
 export default Session;

@@ -2,17 +2,19 @@ import React from "react";
 import moment from "moment";
 import momentDurationFormatSetup from "moment-duration-format";
 
+// @ts-ignore
 momentDurationFormatSetup(moment);
 
-const TimeLeft = ({
+const TimeLeft: React.FC<Props> = ({
   timerLabel,
   handleStartStopClick,
   startStopButtonLabel,
   timeLeft,
-  resetButtonHandler,
+  handleResetButtonClick,
 }) => {
   const formattedTimeLeft = moment
     .duration(timeLeft, "s")
+    // @ts-ignore
     .format("mm:ss", { trim: false });
   return (
     <div className="flex flex-col justify-evenly items-center h-56 w-56 md:w-96 md:h-96 p-8 bg-red-700 rounded-full  my-4 md:mx-0">
@@ -32,7 +34,7 @@ const TimeLeft = ({
         </button>
         <button
           id="reset"
-          onClick={resetButtonHandler}
+          onClick={handleResetButtonClick}
           className="mt-4 text-sm md:text-lg px-4 py-2 border border-gray-200 rounded-lg hover:bg-gray-200 hover:text-red-700 transition duration-300 ease-in-out"
         >
           Reset
@@ -40,6 +42,14 @@ const TimeLeft = ({
       </div>
     </div>
   );
+};
+
+type Props = {
+  timerLabel: string;
+  handleStartStopClick: () => void;
+  startStopButtonLabel: string;
+  timeLeft: number;
+  handleResetButtonClick: () => void;
 };
 
 export default TimeLeft;

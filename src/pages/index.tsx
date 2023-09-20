@@ -1,18 +1,15 @@
 import Head from "next/head";
-import { Inter } from "next/font/google";
 import Break from "@/components/Break";
 import Session from "@/components/Session";
 import { useEffect, useRef, useState } from "react";
 import TimeLeft from "@/components/TimeLeft";
 
-const inter = Inter({ subsets: ["latin"] });
-
 export default function Home() {
-  const audioElement = useRef(null);
+  const audioElement = useRef<HTMLAudioElement>(null);
   const [breakLength, setBreakLength] = useState(300);
   const [sessionLength, setSessionLength] = useState(60 * 25);
   const [currentSessionType, setCurrentSessionType] = useState("Session");
-  const [intervalID, setIntervalID] = useState(null);
+  const [intervalID, setIntervalID] = useState<NodeJS.Timeout | null>(null);
   const [timeLeft, setTimeLeft] = useState(sessionLength);
 
   useEffect(() => {
@@ -21,7 +18,7 @@ export default function Home() {
 
   useEffect(() => {
     if (timeLeft === 0) {
-      audioElement.current.play();
+      audioElement?.current?.play();
       if (currentSessionType === "Session") {
         setCurrentSessionType("Break");
         setTimeLeft(breakLength);
@@ -64,7 +61,9 @@ export default function Home() {
 
   const handleStartStopClick = () => {
     if (isStarted) {
-      clearInterval(intervalID);
+      if (intervalID) {
+        clearInterval(intervalID);
+      }
       setIntervalID(null);
     } else {
       const newIntervalID = setInterval(() => {
@@ -75,13 +74,15 @@ export default function Home() {
   };
 
   const resetButtonHandler = () => {
-    clearInterval(intervalID);
+    if (intervalID) {
+      clearInterval(intervalID);
+    }
     setIntervalID(null);
     setCurrentSessionType("Session");
     setSessionLength(60 * 25);
     setBreakLength(300);
     setTimeLeft(60 * 25);
-    audioElement.current.load();
+    audioElement?.current?.load();
   };
 
   return (
@@ -104,7 +105,7 @@ export default function Home() {
             }
           />
           <TimeLeft
-            resetButtonHandler={resetButtonHandler}
+            handleResetButtonClick={resetButtonHandler}
             timerLabel={currentSessionType}
             handleStartStopClick={handleStartStopClick}
             startStopButtonLabel={isStarted ? "Stop" : "Start"}
