@@ -3,13 +3,22 @@ import { Inter } from "next/font/google";
 import styles from "@/styles/Home.module.css";
 import Break from "@/components/Break";
 import Session from "@/components/Session";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import TimeLeft from "@/components/TimeLeft";
 
 const inter = Inter({ subsets: ["latin"] });
 
 export default function Home() {
+  const audioElement = useRef(null);
   const [breakLength, setBreakLength] = useState(300);
+  const [sessionLength, setSessionLength] = useState(60 * 25);
+  const [currentSessionType, setCurrentSessionType] = useState("Session");
+  const [intervalID, setIntervalID] = useState(null);
+  const [timeLeft, setTimeLeft] = useState(sessionLength);
+
+  useEffect(() => {
+    setTimeLeft(sessionLength);
+  }, [sessionLength]);
 
   const decrementBreakLengthByOneMinute = () => {
     const newBreakLength = breakLength - 60;
@@ -24,8 +33,6 @@ export default function Home() {
     setBreakLength(breakLength + 60);
   };
 
-  const [sessionLength, setSessionLength] = useState(60 * 25);
-
   const decrementSessionLengthByOneMinute = () => {
     const newSessionLength = sessionLength - 60;
     if (newSessionLength < 0) {
@@ -37,6 +44,45 @@ export default function Home() {
 
   const incrementSessionLengthByOneMinute = () => {
     setSessionLength(sessionLength + 60);
+  };
+
+  const isStarted = intervalID !== null;
+
+  const handleStartStopClick = () => {
+    if (isStarted) {
+      clearInterval(intervalID);
+      setIntervalID(null);
+    } else {
+      const newIntervalID = setInterval(() => {
+        setTimeLeft((prevTimeLeft) => {
+          const newTimeLeft = prevTimeLeft - 1;
+          if (newTimeLeft >= 0) {
+            return newTimeLeft;
+          }
+
+          audioElement.current.play();
+
+          if (currentSessionType === "Session") {
+            setCurrentSessionType("Break");
+            setTimeLeft(breakLength);
+          } else if (currentSessionType === "Break") {
+            setCurrentSessionType("Session");
+            setTimeLeft(sesionLength);
+          }
+        });
+      }, 100);
+      setIntervalID(newIntervalID);
+    }
+  };
+
+  const resetButtonHandler = () => {
+    clearInterval(intervalID);
+    setIntervalID(null);
+    setCurrentSessionType("Session");
+    setSessionLength(60 * 25);
+    setBreakLength(300);
+    setTimeLeft(sessionLength);
+    audioElement.current.load();
   };
 
   return (
@@ -53,12 +99,26 @@ export default function Home() {
           decrementSessionLengthByOneMinute={decrementSessionLengthByOneMinute}
           incrementSessionLengthByOneMinute={incrementSessionLengthByOneMinute}
         />
-        <TimeLeft sesionLength={sessionLength} breakLength={breakLength} />
+        <TimeLeft
+          timerLabel={currentSessionType}
+          handleStartStopClick={handleStartStopClick}
+          startStopButtonLabel={isStarted ? "Stop" : "Start"}
+          timeLeft={timeLeft}
+        />
         <Break
           breakLength={breakLength}
           decrementBreakLengthByOneMinute={decrementBreakLengthByOneMinute}
           incrementBreakLengthByOneMinute={incrementBreakLengthByOneMinute}
         />
+        <button id="reset" onClick={resetButtonHandler}>
+          Reset
+        </button>
+        <audio id="beep" ref={audioElement}>
+          <source
+            src="https://assets.mixkit.co/active_storage/sfx/995/995-preview.mp3"
+            type="audio/mpeg"
+          />
+        </audio>
       </main>
     </>
   );
